@@ -16,6 +16,8 @@ module.exports = {
 		}
 	},
 	extends: [
+		'airbnb',
+ 		'airbnb/hooks',
 		'plugin:@typescript-eslint/recommended',
 		'plugin:prettier/recommended',
 		'prettier',
@@ -26,6 +28,11 @@ module.exports = {
 		'plugin:import/typescript',
 		'plugin:eslint-comments/recommended',
 	],
+	parserOptions: {
+		ecmaVersion: 'latest',
+		sourceType: 'module',
+		project: './tsconfig.json',
+	  },
 	rules: {
 		semi: [2, 'always'],
 		quotes: [2, 'single', { avoidEscape: true }],
