@@ -3,30 +3,56 @@ import { Button } from 'src/ui/button';
 import { Text } from 'src/ui/text';
 
 import styles from './ArticleParamsForm.module.scss';
-import { useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Select } from 'src/ui/select/Select';
 import { backgroundColors, contentWidthArr, defaultArticleState, fontColors, fontFamilyClasses, fontFamilyOptions, fontSizeOptions, OptionType } from 'src/constants/articleProps';
 import { Separator } from 'src/ui/separator/Separator';
 import { RadioGroup } from 'src/ui/radio-group';
 
 type ArticleParamsFormProps = {
-	onApply: (styles: typeof defaultArticleState) => void;
+	onStyleChange: (styles: typeof defaultArticleState) => void;
+	currentStyles: typeof defaultArticleState;
 }
 
-export const ArticleParamsForm = ({ onApply }: ArticleParamsFormProps) => {
+export const ArticleParamsForm = ({ currentStyles, onStyleChange }: ArticleParamsFormProps) => {
 	const [isOpenForm, setIsOpenForm] = useState(false);
 	const [formState, setFormState] = useState(defaultArticleState);
+	const asideRef = useRef <HTMLDivElement>(null)
+
+	useEffect(() => {
+		if (!isOpenForm) return;
+
+		const handleOutsideClick = (event:MouseEvent) => {
+			if (asideRef.current && !asideRef.current.contains(event.target as Node)) {
+				setIsOpenForm(false)
+			}
+		};
+
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				setIsOpenForm(false)
+			}
+		};
+
+		document.addEventListener('mousedown', handleOutsideClick)
+		document.addEventListener('keydown', handleKeyDown)
+
+		return () => {
+			document.removeEventListener('mousedown', handleOutsideClick)
+			document.removeEventListener('keydown', handleKeyDown)
+		};
+	}, [isOpenForm])
 
 	const handleApply = (e:React.FormEvent) => {
 		e.preventDefault();
-		onApply(formState);
+		onStyleChange(formState);
 		setIsOpenForm(false);
 	}
 
 	const handleReset = (e: React.FormEvent) => {
 		e.preventDefault();
 		setFormState(defaultArticleState);
-		onApply(defaultArticleState);
+		onStyleChange(defaultArticleState);
 	}
 
 	const updateFormState = (field: keyof typeof defaultArticleState, value: OptionType) => {
@@ -37,7 +63,7 @@ export const ArticleParamsForm = ({ onApply }: ArticleParamsFormProps) => {
 		<>
 			<ArrowButton isOpen={isOpenForm} onClick={() => {setIsOpenForm(!isOpenForm)}} />
 			{isOpenForm && (
-				<aside className={`${styles.container} ${isOpenForm ? styles.container_open : ''}`}>
+				<aside ref={asideRef} className={`${styles.container} ${isOpenForm ? styles.container_open : ''}`}>
 					<form className={styles.form} onSubmit={handleApply} onReset={handleReset}>
 						<Text as='h2' size={31} weight={800} uppercase dynamicLite>Задайте параметры</Text>
 						<Select title="шрифт" 
