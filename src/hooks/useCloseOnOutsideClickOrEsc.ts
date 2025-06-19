@@ -19,7 +19,7 @@ export const useCloseOnOutsideClickOrEsc = (
 				onClose();
 			}
 		};
-
+        
 		document.addEventListener('mousedown', handleOutsideClick)
 		document.addEventListener('keydown', handleKeyDown)
 
