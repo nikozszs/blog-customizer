@@ -8,6 +8,7 @@ import { Select } from 'src/ui/select/Select';
 import { backgroundColors, contentWidthArr, defaultArticleState, fontColors, fontFamilyClasses, fontFamilyOptions, fontSizeOptions, OptionType } from 'src/constants/articleProps';
 import { Separator } from 'src/ui/separator/Separator';
 import { RadioGroup } from 'src/ui/radio-group';
+import { useCloseOnOutsideClickOrEsc } from 'src/hooks/useCloseOnOutsideClickOrEsc';
 
 type ArticleParamsFormProps = {
 	onStyleChange: (styles: typeof defaultArticleState) => void;
@@ -16,32 +17,10 @@ type ArticleParamsFormProps = {
 
 export const ArticleParamsForm = ({ currentStyles, onStyleChange }: ArticleParamsFormProps) => {
 	const [isOpenForm, setIsOpenForm] = useState(false);
-	const [formState, setFormState] = useState(defaultArticleState);
+	const [formState, setFormState] = useState(currentStyles);
 	const asideRef = useRef <HTMLDivElement>(null)
 
-	useEffect(() => {
-		if (!isOpenForm) return;
-
-		const handleOutsideClick = (event:MouseEvent) => {
-			if (asideRef.current && !asideRef.current.contains(event.target as Node)) {
-				setIsOpenForm(false)
-			}
-		};
-
-		const handleKeyDown = (event: KeyboardEvent) => {
-			if (event.key === 'Escape') {
-				setIsOpenForm(false)
-			}
-		};
-
-		document.addEventListener('mousedown', handleOutsideClick)
-		document.addEventListener('keydown', handleKeyDown)
-
-		return () => {
-			document.removeEventListener('mousedown', handleOutsideClick)
-			document.removeEventListener('keydown', handleKeyDown)
-		};
-	}, [isOpenForm])
+	useCloseOnOutsideClickOrEsc(asideRef, isOpenForm, () => setIsOpenForm(false))
 
 	const handleApply = (e:React.FormEvent) => {
 		e.preventDefault();
